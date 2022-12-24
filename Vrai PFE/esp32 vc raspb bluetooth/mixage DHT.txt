@@ -1,0 +1,32 @@
+#include "DHTesp.h"
+#include "BluetoothSerial.h"
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+BluetoothSerial SerialBT;
+DHTesp dht;
+float currentTemp;
+float currentHumidity;
+
+void setup() {
+  Serial.begin(115200);
+   SerialBT.begin("ESP32test");
+  Serial.println("The device started, now you can pair it with bluetooth!");
+   dht.setup(27, DHTesp::DHT22);
+  currentTemp = dht.getTemperature();
+  currentHumidity = dht.getHumidity();
+}
+void loop() {
+    float temperature = dht.getTemperature();
+  float humidity = dht.getHumidity();
+  if (temperature != currentTemp || humidity != currentHumidity)
+  {
+    currentTemp = temperature;
+    currentHumidity = humidity;  
+    SerialBT.println(temperature);
+    SerialBT.println(humidity);
+   
+  }
+   
+  delay(20);
+}
